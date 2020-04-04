@@ -1,0 +1,72 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org" lang="zh">
+<head>
+    <title th:text="${sectionName}"></title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap.css}">
+    <link rel="stylesheet" th:href="@{/css/community.css}">
+    <script th:src="@{/webjars/jquery/1.11.1/jquery.min.js}"></script>
+    <script th:src="@{/webjars/bootstrap/3.3.5/js/bootstrap.min.js}"></script>
+    <link rel="stylesheet" th:href="@{/webjars/bootstrap/3.3.5/css/bootstrap-theme.min.css}">
+</head>
+<body>
+<div th:replace="navagation :: nav"></div>
+<div class="container-fluid main profile">
+    <div class="row">
+        <div class="col-lg-9 col-md-12 col-sm-12 col-xs-12">
+            <h2><span th:text="${sectionName}"></span></h2>
+            <hr>
+            <div th:if="${section}=='questions'">
+                <div class="media" th:each="questionDTO:${pageInfoDTO.questionDTOS}">
+                    <div class="media-left">
+                        <img class="media-object" th:src="${questionDTO.user.avatarUrl}" style="margin-top: 5px;height: 50px;width: 50px">
+                    </div>
+                    <div class="media-body">
+                        <a th:href="@{'/question/' + ${questionDTO.id}}">
+                            <h4 class="media-heading" th:text="${questionDTO.title}">Media heading</h4>
+                        </a>
+                        <!--<span th:text="${questionDTO.description}"></span>-->
+                        <span class="text-desc">[[${questionDTO.commentCount}]] 个回复 • [[${questionDTO.viewCount}]] 次浏览 •
+                            [[${#dates.format(questionDTO.gmtCreate,'yyyy-MM-dd HH:mm')}]] • </span>
+                        <a class="community-menu" th:href="@{'/publish/'+${questionDTO.id}}"
+                           th:if="${session.user!=null && session.user.id == questionDTO.creator}">
+                            <span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>编辑
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-12 col-sm-12 col-xs-12">
+            <div class="list-group section">
+                <a th:href="@{/profile/questions}" th:class="${section=='questions'}? 'list-group-item active':'list-group-item'">我的问题</a>
+                <a th:href="@{/profile/replies}" th:class="${section=='replies'}? 'list-group-item active':'list-group-item'">最新回复
+                    <span class="badge">14</span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <nav aria-label="Page navigation" th:if="${section}=='questions'">
+        <ul class="pagination" th:if="${pageInfoDTO.totalPages>5}">
+            <li th:if="${pageInfoDTO.isToFirst()==true}">
+                <a th:href="@{/profile/questions(currentPage=1)}">首页</a>
+            </li>
+            <li>
+                <a href="#" aria-label="Previous" th:if="${pageInfoDTO.isToLast()==true}" th:href="@{/profile/questions(currentPage=${pageInfoDTO.currentPage}-1)}">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+            </li>
+            <li th:class="${pageInfoDTO.currentPage==pageNum}?active" th:each="pageNum:${pageInfoDTO.pageNumbers}"><a th:href="@{/profile/questions(currentPage=${pageNum})}" th:text="${pageNum}"></a></li>
+            <li>
+                <a href="#" aria-label="Next" th:if="${pageInfoDTO.isToNext()==true}" th:href="@{/profile/questions(currentPage=${pageInfoDTO.currentPage}+1)}">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+            </li>
+            <li th:if="${pageInfoDTO.isToEnd()==true}">
+                <a th:href="@{/profile/questions(currentPage=${pageInfoDTO.totalPages})}">末页</a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
+</body>
+</html>

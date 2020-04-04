@@ -1,6 +1,8 @@
 package com.ylhaha.community.controller;
 
+import com.ylhaha.community.dto.PageInfoDTO;
 import com.ylhaha.community.model.User;
+import com.ylhaha.community.service.QuestionService;
 import com.ylhaha.community.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,22 +21,17 @@ public class IndexController {
 
     @Autowired
     UserService userService;
+    @Autowired
+    QuestionService questionService;
 
     @GetMapping(value = {"/","/index"})
-    public String hello(HttpServletRequest request){
-        //获取cookie中的token
-        Cookie[] cookies = request.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie != null && cookie.getName().equals("token")) {
-                String token = cookie.getValue();
-                //根据token得到数据库中的user
-                User user = userService.getUser(token);
-                if (user != null) {
-                    request.getSession().setAttribute("user",user);
-                    break;
-                }
-            }
-        }
+    public String hello(Model model,
+                        @RequestParam(value = "currentPage",defaultValue = "1")Integer currentPage,
+                        @RequestParam(value = "pageSize",defaultValue = "5")Integer pageSize){
+
+        //获取Question中的数据展示到页面上
+        PageInfoDTO pageInfoDTO = questionService.list(currentPage,pageSize, 0);
+        model.addAttribute("pageInfoDTO",pageInfoDTO);
         return "index";
     }
 }
